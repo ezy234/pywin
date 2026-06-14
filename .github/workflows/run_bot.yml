@@ -1,0 +1,62 @@
+name: Portal Bot
+on:
+  workflow_dispatch:
+jobs:
+  run-bot:
+    runs-on: windows-latest
+    timeout-minutes: 350   # below GitHub's hard 6h (360 min) kill
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Dependencies
+        run: |
+          pip install playwright pywinauto supabase pywin32 pyautogui groq pdfplumber
+          playwright install chrome
+      - name: Log versions
+        shell: pwsh
+        run: |
+          Write-Host "Playwright: $(playwright --version)"
+          $p = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+          if (Test-Path $p) { Write-Host "System Chrome: $((Get-Item $p).VersionInfo.ProductVersion)" }
+      - name: Run Bot Script
+        run: python bot.py
+        env:
+          PYTHONUNBUFFERED: "1"
+          PYTHONIOENCODING: "utf-8"
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_TABLE: ${{ secrets.SUPABASE_TABLE }}
+          SUPABASE_BUCKET: ${{ secrets.SUPABASE_BUCKET }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PORTAL_URL: ${{ secrets.PORTAL_URL }}
+          REG_INPUT_SELECTOR: ${{ secrets.REG_INPUT_SELECTOR }}
+          LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
+          PRINT_BUTTON_SELECTOR: ${{ secrets.PRINT_BUTTON_SELECTOR }}
+          WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
+          LOGIN_TIMEOUT_SECONDS: "60"
+          RUN_BUDGET_MINUTES: "330"   # stop gracefully before the 350-min job timeout
+      - name: Upload Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Bot-Screenshots
+          path: screenshots/
+          if-no-files-found: ignore
+      - name: Re-dispatch if work remains
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.CONTINUE_PAT }}
+        run: |
+          if (-not (Test-Path ".continue")) {
+            Write-Host "No .continue sentinel; run complete, not re-dispatching."
+          } elseif ([string]::IsNullOrEmpty($env:GH_TOKEN)) {
+            Write-Host "Work remains but CONTINUE_PAT secret not set; skipping re-dispatch."
+          } else {
+            Write-Host "Work remains -> re-dispatching workflow to continue."
+            gh workflow run run_bot.yml --ref ${{ github.ref_name }}
+          }
