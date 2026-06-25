@@ -16,12 +16,6 @@ jobs:
         run: |
           pip install playwright pywinauto supabase pywin32 pyautogui groq pdfplumber
           playwright install chrome
-      - name: Log versions
-        shell: pwsh
-        run: |
-          Write-Host "Playwright: $(playwright --version)"
-          $p = "C:\Program Files\Google\Chrome\Application\chrome.exe"
-          if (Test-Path $p) { Write-Host "System Chrome: $((Get-Item $p).VersionInfo.ProductVersion)" }
       - name: Run Bot Script
         run: python bot.py
         env:
@@ -39,13 +33,6 @@ jobs:
           WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
           LOGIN_TIMEOUT_SECONDS: "60"
           RUN_BUDGET_MINUTES: "330"   # stop gracefully before the 350-min job timeout
-      - name: Upload Screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Bot-Screenshots
-          path: screenshots/
-          if-no-files-found: ignore
       - name: Re-dispatch if work remains
         if: always()
         shell: pwsh
