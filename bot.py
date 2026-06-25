@@ -55,7 +55,7 @@ SCREENSHOT_DIR = "screenshots"  # uploaded as a workflow artifact for debugging
 # Fields parsed from each candidate's slip.
 FIELDS = [
     "fullname", "gender", "date_of_birth", "email", "mobile_phone",
-    "jamb_reg_no", "state_of_origin", "address", "local_government",
+    "reg_no", "state_of_origin", "address", "local_government",
 ]
 # Fields added from the uploaded list (NOT from the slip): course + faculty
 # come from the PDF, list_name is the PDF filename.
@@ -375,7 +375,7 @@ def parse_slip_text(raw_text):
         "date_of_birth":    extract(r"Date of birth\s+(\d{4}-\d{2}-\d{2})", raw_text),
         "email":            extract(r"Email address\s+(\S+)", raw_text),
         "mobile_phone":     extract(r"Mobile phone\s+(\d+)", raw_text),
-        "jamb_reg_no":      extract(r"JAMB Reg No\s+(\S+)", raw_text),
+        "reg_no":           extract(r"JAMB Reg No\s+(\S+)", raw_text),
         "state_of_origin":  extract(r"State of origin\s+(.+?)\s+Address", raw_text),
         "address":          extract(r"Address\s+(.+?)\s+(?:Local government|L\.?G\.?A\.?|Email|Mobile)", raw_text),
         "local_government": extract(r"(?:Local government|L\.?G\.?A\.?)\s+(.+?)\s+(?:Email|Mobile|State)", raw_text),
@@ -466,14 +466,14 @@ def fetch_done_regs(list_name):
         step, start = 1000, 0
         while True:
             res = (sb.table(SUPABASE_TABLE)
-                     .select("jamb_reg_no")
+                     .select("reg_no")
                      .eq("list_name", list_name)
                      .range(start, start + step - 1)
                      .execute())
             rows = res.data or []
             for r in rows:
-                if r.get("jamb_reg_no"):
-                    done.add(r["jamb_reg_no"].upper())
+                if r.get("reg_no"):
+                    done.add(r["reg_no"].upper())
             if len(rows) < step:
                 break
             start += step
@@ -486,13 +486,13 @@ def record_exists(reg, list_name):
     """
     A candidate is a duplicate only if the SAME reg appears in the SAME list.
     The same person may legitimately appear in two different lists under a
-    different faculty/course, so we key on (jamb_reg_no, list_name).
+    different faculty/course, so we key on (reg_no, list_name).
     """
     try:
         sb = _get_supabase()
         res = (sb.table(SUPABASE_TABLE)
-                 .select("jamb_reg_no")
-                 .eq("jamb_reg_no", reg)
+                 .select("reg_no")
+                 .eq("reg_no", reg)
                  .eq("list_name", list_name)
                  .limit(1)
                  .execute())
@@ -503,7 +503,7 @@ def record_exists(reg, list_name):
 
 
 def save_to_supabase_table(parsed_data):
-    reg = parsed_data.get("jamb_reg_no", "")
+    reg = parsed_data.get("reg_no", "")
     list_name = parsed_data.get("list_name", "")
     if record_exists(reg, list_name):
         print(f"SKIP insert: {reg} already saved for list '{list_name}'.")
@@ -673,23 +673,23 @@ def _parse_slip(raw, reg, template, use_template):
     """Parse one slip: template (primary) or regex+verify (fallback)."""
     if use_template:
         d = parse_with_template(raw, template["labels"])
-        d["jamb_reg_no"] = reg
+        d["reg_no"] = reg
         if not validate_parsed(d):
             print(f"Template parse incomplete for {reg}; AI rescue.")
             rescue = llm_parse_single(raw)
             if rescue:
-                rescue["jamb_reg_no"] = reg
+                rescue["reg_no"] = reg
                 d = rescue
         return d
 
     # Fallback: regex first, then Groq verifies the cheap result.
     d = parse_slip_text(raw)
-    d["jamb_reg_no"] = reg
+    d["reg_no"] = reg
     if not verify_one(d):
         print(f"Groq flagged {reg} as garbage; re-parsing with AI.")
         rescue = llm_parse_single(raw)
         if rescue:
-            rescue["jamb_reg_no"] = reg
+            rescue["reg_no"] = reg
             d = rescue
     return d
 
