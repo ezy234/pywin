@@ -50,8 +50,6 @@ CONTINUE_FILE = ".continue"
 # Configurable via env (seconds); defaults to 60s.
 LOGIN_TIMEOUT_MS = int(os.environ.get("LOGIN_TIMEOUT_SECONDS", "60")) * 1000
 
-SCREENSHOT_DIR = "screenshots"  # uploaded as a workflow artifact for debugging
-
 # Fields parsed from each candidate's slip.
 FIELDS = [
     "fullname", "gender", "date_of_birth", "email", "mobile_phone",
@@ -117,13 +115,11 @@ def _clean_field(field, value):
 # --------------------------------------------------------------------------- #
 def _get_groq():
     if not GROQ_API_KEY:
-        print("WARN: GROQ_API_KEY not set; AI steps disabled (regex/heuristics only).")
         return None
     try:
         from groq import Groq
         return Groq(api_key=GROQ_API_KEY)
-    except Exception as e:
-        print(f"WARN: Groq client unavailable ({e}); regex/heuristics only.")
+    except Exception:
         return None
 
 
@@ -140,8 +136,7 @@ def _groq_json(client, prompt, system):
             ],
         )
         return json.loads(resp.choices[0].message.content)
-    except Exception as e:
-        print(f"ERROR: Groq call failed: {e}")
+    except Exception:
         return None
 
 
@@ -165,13 +160,11 @@ def fetch_pdf_from_storage():
     try:
         sb = _get_supabase()
         entries = sb.storage.from_(SUPABASE_BUCKET).list()
-    except Exception as e:
-        print(f"ERROR: could not list Storage bucket '{SUPABASE_BUCKET}': {e}")
+    except Exception:
         return None, None
 
     pdfs = [f for f in entries if (f.get("name") or "").lower().endswith(".pdf")]
     if not pdfs:
-        print(f"ERROR: no PDF found in Storage bucket '{SUPABASE_BUCKET}'.")
         return None, None
 
     def _ts(f):
@@ -183,12 +176,10 @@ def fetch_pdf_from_storage():
     name = latest["name"]
     try:
         data = sb.storage.from_(SUPABASE_BUCKET).download(name)
-    except Exception as e:
-        print(f"ERROR: could not download '{name}' from Storage: {e}")
+    except Exception:
         return None, None
 
     list_name = os.path.splitext(os.path.basename(name))[0]
-    print(f"Using list from Storage: {name} ({len(data)} bytes)")
     return list_name, data
 
 
@@ -196,7 +187,6 @@ def _choose_course_x(header_words):
     """Find the x where the course/department column starts (heuristic + Groq)."""
     for w in header_words:
         if re.search(r"course|depart|programme|program", w["text"], re.IGNORECASE):
-            print(f"Course/department column: '{w['text']}' @ x={w['x0']:.0f}")
             return w["x0"]
     # Groq fallback handles a relabelled header.
     client = _get_groq()
@@ -210,9 +200,7 @@ def _choose_course_x(header_words):
         res = _groq_json(client, prompt, "You map table columns by meaning.")
         if res and isinstance(res.get("index"), int) and 0 <= res["index"] < len(header_words):
             w = header_words[res["index"]]
-            print(f"Groq course column: '{w['text']}' @ x={w['x0']:.0f}")
             return w["x0"]
-    print("WARN: could not locate course column; courses will be empty.")
     return None
 
 
@@ -287,7 +275,6 @@ def read_records(pdf_source):
                     "faculty": fac,
                 })
 
-    print(f"Extracted {len(records)} candidates (reg + course + faculty) from PDF.")
     return records
 
 
@@ -477,8 +464,8 @@ def fetch_done_regs(list_name):
             if len(rows) < step:
                 break
             start += step
-    except Exception as e:
-        print(f"WARN: could not fetch already-done regs: {e}")
+    except Exception:
+        pass
     return done
 
 
@@ -497,8 +484,7 @@ def record_exists(reg, list_name):
                  .limit(1)
                  .execute())
         return bool(res.data)
-    except Exception as e:
-        print(f"WARN: existence check failed for {reg}: {e}")
+    except Exception:
         return False  # don't block the insert on a check error
 
 
@@ -506,15 +492,11 @@ def save_to_supabase_table(parsed_data):
     reg = parsed_data.get("reg_no", "")
     list_name = parsed_data.get("list_name", "")
     if record_exists(reg, list_name):
-        print(f"SKIP insert: {reg} already saved for list '{list_name}'.")
         return False
-    print(f"DEBUG: Saving to Supabase -> {parsed_data}")
     try:
-        response = _get_supabase().table(SUPABASE_TABLE).insert(parsed_data).execute()
-        print(f"SUCCESS: Saved {reg} to '{SUPABASE_TABLE}'. Response: {response}")
+        _get_supabase().table(SUPABASE_TABLE).insert(parsed_data).execute()
         return True
-    except Exception as e:
-        print(f"ERROR: Supabase insert failed: {e}")
+    except Exception:
         return False
 
 
@@ -546,45 +528,15 @@ def get_clipboard_text():
     return data
 
 
-def _safe_name(reg):
-    return re.sub(r"[^A-Za-z0-9]", "_", reg)
-
-
-def _shot(page, name):
-    """Save a Playwright screenshot (reliable on CI) for debugging."""
-    try:
-        os.makedirs(SCREENSHOT_DIR, exist_ok=True)
-        path = os.path.join(SCREENSHOT_DIR, name)
-        # short timeout + not full_page: a blocking print dialog would otherwise
-        # hang the screenshot for 30s.
-        page.screenshot(path=path, full_page=False, timeout=10000)
-        print(f"DEBUG: screenshot -> {path}")
-    except Exception as e:
-        print(f"DEBUG: screenshot failed ({name}): {e}")
-
-
-def _log_window_titles():
-    """Dump all open top-level window titles so we can see the real one."""
-    try:
-        titles = [w.window_text() for w in Desktop(backend="uia").windows()]
-        titles = [t for t in titles if t and t.strip()]
-        print(f"DEBUG: open window titles -> {titles}")
-    except Exception as e:
-        print(f"DEBUG: could not list windows: {e}")
-
-
 def pywinauto_copy_handler():
     """Focus the window, click center, Ctrl+A, Ctrl+C."""
     desktop = Desktop(backend="uia")
     try:
         chrome_win = desktop.window(title_re=WINDOW_TITLE_RE)
         if not chrome_win.exists():
-            print(f"ERROR: window matching '{WINDOW_TITLE_RE}' not found.")
-            _log_window_titles()
             return
         chrome_win.set_focus()
         time.sleep(8)
-        print("Pywinauto: clicking center + Ctrl+A/Ctrl+C ...")
         w, h = pyautogui.size()
         pyautogui.click(w // 2, h // 2)
         time.sleep(1)
@@ -592,8 +544,8 @@ def pywinauto_copy_handler():
         time.sleep(2)
         keyboard.send_keys("^c")
         time.sleep(2)
-    except Exception as e:
-        print(f"ERROR during pywinauto sequence: {e}")
+    except Exception:
+        pass
 
 
 def scrape_slip(context, reg):
@@ -604,7 +556,6 @@ def scrape_slip(context, reg):
     """
     page = context.new_page()
     try:
-        print(f"--- Scraping {reg} ---")
         # Original flow: open login page, wait for it, enter reg, click Login.
         page.goto(PORTAL_URL, timeout=LOGIN_TIMEOUT_MS)
         page.wait_for_load_state("networkidle", timeout=LOGIN_TIMEOUT_MS)
@@ -615,52 +566,27 @@ def scrape_slip(context, reg):
         try:
             page.wait_for_load_state("networkidle", timeout=LOGIN_TIMEOUT_MS)
         except PlaywrightTimeoutError:
-            print(f"SKIP {reg}: portal took too long to load after login.")
-            _shot(page, f"{_safe_name(reg)}_1_login_timeout.png")
             return ""
         time.sleep(5)  # let the dashboard / next page settle (original behavior)
 
-        tag = _safe_name(reg)
-        _shot(page, f"{tag}_1_after_login.png")
-
         btn_selector = PRINT_BUTTON_SELECTOR
         if not page.is_visible(btn_selector):
-            print(f"SKIP {reg}: print-slip button not found.")
-            _shot(page, f"{tag}_2_no_print_button.png")
             return ""
 
-        before = set(context.pages)
         page.click(btn_selector)
         time.sleep(8)  # let the slip / print view render
 
-        # Did the print click open a new tab/popup, or render in-page?
-        new_pages = [p for p in context.pages if p not in before]
-        if new_pages:
-            print(f"DEBUG: {reg}: print opened {len(new_pages)} new tab/popup -> "
-                  f"{[p.url for p in new_pages]}")
-            for n, np in enumerate(new_pages):
-                _shot(np, f"{tag}_3b_popup{n}.png")
-        else:
-            print(f"DEBUG: {reg}: print opened NO new tab (likely in-page or "
-                  f"native print window).")
-        _shot(page, f"{tag}_3_after_print_click.png")
-
         # Capture via clipboard, validating that we got THIS candidate's slip.
-        for attempt in (1, 2):
+        for _ in range(2):
             clear_clipboard()  # avoid carrying over the previous candidate
             pywinauto_copy_handler()
             raw = get_clipboard_text() or ""
             if _looks_like_slip(raw) and _slip_matches_reg(raw, reg):
-                print(f"DEBUG: {reg} -> {len(raw)} chars captured.")
                 return raw
-            print(f"WARN {reg}: no valid slip text after copy (attempt {attempt}).")
-        print(f"SKIP {reg}: could not capture a valid slip.")
         return ""
     except PlaywrightTimeoutError:
-        print(f"SKIP {reg}: navigation timed out (>60s).")
         return ""
-    except Exception as e:
-        print(f"ERROR scraping {reg}: {e}")
+    except Exception:
         return ""
     finally:
         page.close()
@@ -675,7 +601,6 @@ def _parse_slip(raw, reg, template, use_template):
         d = parse_with_template(raw, template["labels"])
         d["reg_no"] = reg
         if not validate_parsed(d):
-            print(f"Template parse incomplete for {reg}; AI rescue.")
             rescue = llm_parse_single(raw)
             if rescue:
                 rescue["reg_no"] = reg
@@ -686,7 +611,6 @@ def _parse_slip(raw, reg, template, use_template):
     d = parse_slip_text(raw)
     d["reg_no"] = reg
     if not verify_one(d):
-        print(f"Groq flagged {reg} as garbage; re-parsing with AI.")
         rescue = llm_parse_single(raw)
         if rescue:
             rescue["reg_no"] = reg
@@ -701,8 +625,6 @@ def _process_and_save(rec, raw, template, use_template, list_name):
     data["course"] = rec.get("course", "")
     data["faculty"] = rec.get("faculty", "")
     data["list_name"] = list_name
-    if not validate_parsed(data):
-        print(f"WARN: still incomplete -> {data}")
     save_to_supabase_table(data)
 
 
@@ -710,7 +632,6 @@ def run_bot():
     # Fail fast if any portal/Supabase secret is missing.
     missing = [name for name in REQUIRED_SECRETS if not os.environ.get(name)]
     if missing:
-        print("ERROR: missing required secrets: " + ", ".join(missing))
         return
 
     # Clear any stale sentinel from a previous run.
@@ -720,26 +641,19 @@ def run_bot():
     list_name, pdf_bytes = fetch_pdf_from_storage()
     if not pdf_bytes:
         return
-    print(f"List name: {list_name}")
     candidates = read_records(io.BytesIO(pdf_bytes))
     if not candidates:
-        print("ERROR: no candidates extracted. Nothing to do.")
         return
 
     # Resume: drop candidates already saved for this list (skips re-scraping).
     done = fetch_done_regs(list_name)
     if done:
-        before = len(candidates)
         candidates = [c for c in candidates if c["reg"] not in done]
-        print(f"Resume: {len(done)} already saved for '{list_name}'; "
-              f"{before - len(candidates)} skipped, {len(candidates)} remaining.")
 
     if MAX_CANDIDATES > 0:
         candidates = candidates[:MAX_CANDIDATES]
-        print(f"Capped to first {len(candidates)} (MAX_CANDIDATES).")
 
     if not candidates:
-        print("Nothing left to do.")
         return
 
     # Stream: scrape -> parse -> save each candidate before the next one.
@@ -753,21 +667,16 @@ def run_bot():
         if tpl:
             check = parse_with_template(samples[0][1], tpl["labels"])
             use = template_self_check(check, tpl.get("values", {}))
-            print(f"Template self-check {'PASSED' if use else 'FAILED'}.")
         return tpl, use
 
     with sync_playwright() as p:
-        print("--- Launching Google Chrome ---")
         browser = p.chromium.launch(channel="chrome", headless=False)
-        print(f"Browser version: {browser.version}")
         context = browser.new_context()
 
         start_ts = time.time()
         stopped_early = False
         for rec in candidates:
             if RUN_BUDGET_MINUTES and (time.time() - start_ts) > RUN_BUDGET_MINUTES * 60:
-                print(f"Time budget ({RUN_BUDGET_MINUTES} min) reached; stopping early. "
-                      f"Remaining candidates will resume on the next run.")
                 stopped_early = True
                 break
             raw = scrape_slip(context, rec["reg"])
@@ -795,8 +704,6 @@ def run_bot():
     if stopped_early:
         with open(CONTINUE_FILE, "w") as f:
             f.write("more work remaining")
-        print("Stopped early -> wrote .continue (workflow will re-dispatch).")
-    print("Done.")
 
 
 if __name__ == "__main__":
