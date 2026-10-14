@@ -3,6 +3,7 @@ import argparse
 import csv
 import json
 import os
+import random
 import re
 import sys
 import time
@@ -17,6 +18,7 @@ LABELS = {
     'state_of_origin': r'State\s+of\s+origin', 'address': r'(?<!Email )\bAddress',
     'local_government': r'Local\s+government(?:\s+area)?|L\.?G\.?A\.?',
 }
+SAVE_ACTIONS = ('inserted', 'updated', 'unchanged', 'already_processed', 'kept_unknown_session')
 
 
 def parse_labeled_slip(raw, candidate):
@@ -55,11 +57,12 @@ def retry(operation, callback, attempts=3, sleep=time.sleep):
             return callback()
         except Exception as error:
             code = str(getattr(error, 'code', ''))
-            permanent = isinstance(error, (ValueError, PermissionError)) or code.startswith(('22', '23', '42')) or code in {'PGRST204', 'PGRST205', 'PGRST301', 'PGRST302'}
+            permanent = isinstance(error, (ValueError, PermissionError)) or code.startswith(('22', '23', '42')) or code in {'PGRST202', 'PGRST204', 'PGRST205', 'PGRST301', 'PGRST302'}
             print(f'WARNING: {operation} failed ({type(error).__name__}); attempt {attempt}/{attempts}.', flush=True)
             if permanent or attempt == attempts:
                 raise RuntimeError(f'{operation} failed ({type(error).__name__}). Check connectivity, Actions secrets, and destination table permissions/schema.') from None
-            sleep(min(2 ** attempt, 15))
+            base_delay = min(2 ** attempt, 15)
+            sleep(random.uniform(base_delay * 0.75, base_delay * 1.25))
 
 
 def save_progress(path, progress):
@@ -85,15 +88,22 @@ def load_progress(path, dataset):
                 raise ValueError('Invalid progress counters in checkpoint')
         if not isinstance(progress.get('failures'), list):
             raise ValueError('Invalid failures in progress checkpoint')
+        for action in SAVE_ACTIONS:
+            progress.setdefault(action, 0)
+            if not isinstance(progress[action], int) or progress[action] < 0:
+                raise ValueError('Invalid email-save counters in checkpoint')
         return progress
     return {'fingerprint': dataset.fingerprint, 'next_index': 0, 'saved': 0, 'skipped_existing': 0,
-            'failed': 0, 'consecutive_failures': 0, 'failures': [], 'complete': False}
+            'failed': 0, 'consecutive_failures': 0, 'failures': [], 'complete': False,
+            **{action: 0 for action in SAVE_ACTIONS}}
 
 
 def fetch_done(client, table, list_name):
+    if table != 'portal_candidates':
+        raise ValueError('The CSV email-identity workflow requires SUPABASE_TABLE=portal_candidates')
     done, start = set(), 0
     while True:
-        response = retry('Read saved candidate checkpoint', lambda: client.table(table).select('reg_no').eq('list_name', list_name).order('reg_no').range(start, start + 999).execute())
+        response = retry('Read saved candidate checkpoint', lambda: client.table('portal_candidate_sources').select('reg_no').eq('list_name', list_name).order('reg_no').range(start, start + 999).execute())
         rows = response.data
         if not isinstance(rows, list):
             raise RuntimeError('Supabase returned an invalid checkpoint response')
@@ -103,7 +113,16 @@ def fetch_done(client, table, list_name):
         start += 1000
 
 
-def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline, clock=time.monotonic):
+def save_candidate(client, parsed, academic_session):
+    response = retry('Save candidate by email', lambda: client.rpc('save_portal_candidate',
+        {'p_candidate': parsed, 'p_academic_session': academic_session}).execute())
+    result = response.data
+    if not isinstance(result, dict) or result.get('action') not in SAVE_ACTIONS or not isinstance(result.get('candidate_id'), int):
+        raise RuntimeError('Invalid email-save RPC response; check the deployed database migration')
+    return result['action']
+
+
+def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline, clock=time.monotonic, pace=None):
     done_lists = {}
     initial_index = progress['next_index']
     while progress['next_index'] < len(dataset.candidates):
@@ -124,6 +143,8 @@ def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline
             continue
         parsed = None
         for attempt in range(1, 3):
+            if pace is not None:
+                pace()
             raw = scrape(reg)
             if raw:
                 try:
@@ -137,7 +158,8 @@ def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline
             progress['consecutive_failures'] += 1
             progress['failures'].append({'list_name': list_name, 'jamb_reg_no': reg, 'source_page': candidate['source_page'], 'reason': 'portal_unavailable_or_slip_mismatch', 'attempts': 2})
         else:
-            retry('Save candidate', lambda: client.table(table).upsert(parsed, on_conflict='reg_no,list_name', ignore_duplicates=True).execute())
+            action = save_candidate(client, parsed, candidate['academic_session'])
+            progress[action] += 1
             done_lists[list_name].add(reg)
             progress['saved'] += 1
             progress['consecutive_failures'] = 0
@@ -153,7 +175,7 @@ def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline
 def reports(directory, dataset, progress, status):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
-    summary = {'status': status, **dataset.statistics, **{key: progress[key] for key in ['next_index', 'saved', 'skipped_existing', 'failed', 'complete']}}
+    summary = {'status': status, **dataset.statistics, **{key: progress[key] for key in ['next_index', 'saved', 'skipped_existing', 'failed', 'complete', *SAVE_ACTIONS]}}
     (directory / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
     with (directory / 'failures.csv').open('w', encoding='utf-8', newline='') as handle:
         writer = csv.DictWriter(handle, ['list_name', 'jamb_reg_no', 'source_page', 'reason', 'attempts'])
@@ -194,13 +216,17 @@ def main():
         from supabase.client import ClientOptions
         client = create_client(os.environ['SUPABASE_URL'], os.environ['SUPABASE_KEY'], options=ClientOptions(postgrest_client_timeout=30))
         table = os.environ['SUPABASE_TABLE']
-        retry('Validate destination table', lambda: client.table(table).select('reg_no,list_name').limit(1).execute())
+        if table != 'portal_candidates':
+            raise ValueError('The CSV email-identity workflow requires SUPABASE_TABLE=portal_candidates')
+        retry('Validate email-identity migration', lambda: client.table(table).select('reg_no,list_name,email_normalized,academic_session').limit(1).execute())
+        retry('Validate source-receipt table', lambda: client.table('portal_candidate_sources').select('reg_no,list_name,candidate_id').limit(1).execute())
         deadline = time.monotonic() + args.minutes * 60
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(channel='chrome', headless=False)
             try:
                 context = browser.new_context()
-                complete = process_queue(dataset, progress, client, table, lambda reg: bot.scrape_slip(context, reg), checkpoint, deadline)
+                complete = process_queue(dataset, progress, client, table, lambda reg: bot.scrape_slip(context, reg), checkpoint, deadline,
+                                         pace=lambda: time.sleep(random.uniform(1, 3)))
             finally:
                 browser.close()
         reports(args.state_dir, dataset, progress, 'complete' if complete else 'continuing')

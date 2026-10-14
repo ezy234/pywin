@@ -45,7 +45,38 @@ Failed candidates advance the checkpoint so they cannot trap subsequent sessions
 in an infinite retry loop. Five consecutive portal failures stop the chain with
 an error. A completed queue with failed candidates also reports a failed job.
 Database failures stop immediately after bounded retries and never advance past
-an unsaved record. Unique `(reg_no, list_name)` upserts make retries safe.
+an unsaved record. Person writes and source receipts commit atomically, making
+retries safe even when a previous response was lost.
+
+## Email identity and session precedence
+
+`portal_candidates` contains one person per nonblank email, matched after
+trimming spaces and lowercasing. The database enforces that uniqueness.
+The first observation creates the person. When another list has that email:
+
+- A strictly newer academic session updates only `course` (department) and
+  `faculty`, plus the session and department-source tracking fields.
+- The same or an older session leaves the person unchanged. Thus, newest-first
+  processing preserves the first session's details; oldest-first processing
+  advances those details as newer sessions arrive.
+- The original name, phone, other profile fields, and original JAMB/list remain
+  intact. `academic_session`, `department_source_list`, and
+  `department_source_reg_no` identify the source of the current department.
+- A blank email retains list/JAMB identity; unrelated people with missing emails
+  are not merged. A legacy person with an unknown session is retained and counted
+  as `kept_unknown_session` rather than assumed to be older.
+
+`portal_candidate_sources` records every completed `(list_name, reg_no)`, including
+older observations that did not change a person. Resume reads this table, so
+email deduplication cannot cause the same CSV entries to be scraped indefinitely.
+Summary artifacts count inserted, updated, unchanged, already-processed, and
+unknown-session outcomes. Older progress artifacts remain compatible.
+
+Apply both migrations in `supabase/migrations` before using the CSV runner.
+The email migration refuses to silently delete existing duplicate emails.
+`save_portal_candidate(jsonb, text)` is a service-role-only database function;
+its transaction locks and unique index protect concurrent workers as well as retries.
+The rollback-only database regression cases are in `tests/email_identity.sql`.
 
 To recover after an error, fix the reported problem and start a run with the
 failed run's `resume_run_id` (artifacts are retained for 14 days). To retry all
@@ -54,7 +85,10 @@ database records will still be skipped. A changed manifest/session cannot reuse
 an old checkpoint. Cancel the active run to stop the chain; there is no cron.
 
 Installation and dispatch use bounded retries. Database requests have 30-second
-timeouts and up to three attempts; each portal candidate has up to two attempts.
+timeouts and up to three attempts, with random jitter in retry waits. Each portal
+attempt starts after a random 1–3 second pause, in addition to the browser's
+existing rendering waits, and each candidate has up to two attempts. Request
+timeouts stay fixed (portal login: 60 seconds) so requests remain bounded.
 Missing secrets, corrupt CSVs/checkpoints, changed inputs, schema errors, and
 failed checkpoint uploads stop continuation with an actionable error. Logs show
 counts and queue positions, without raw slips or secret values.
