@@ -1,0 +1,62 @@
+name: Portal Bot - 45 minute sessions
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: portal-bot-continuous
+  cancel-in-progress: false
+jobs:
+  run-bot:
+    runs-on: windows-latest
+    timeout-minutes: 60   # includes setup and shutdown time
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Test resume behavior
+        run: python -m unittest discover -s tests -v
+      - name: Install Dependencies
+        run: |
+          pip install playwright pywinauto supabase pywin32 pyautogui groq pdfplumber
+          playwright install chrome
+      - name: Run Bot Script
+        run: python bot.py
+        env:
+          PYTHONUNBUFFERED: "1"
+          PYTHONIOENCODING: "utf-8"
+          SUPABASE_URL: ${{ secrets.CONTINUOUS_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.CONTINUOUS_SUPABASE_KEY }}
+          SUPABASE_TABLE: portal_candidates
+          SUPABASE_SOURCE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SOURCE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_BUCKET: ${{ secrets.SUPABASE_BUCKET }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ secrets.GROQ_MODEL || 'openai/gpt-oss-120b' }}
+          PORTAL_URL: ${{ secrets.PORTAL_URL }}
+          REG_INPUT_SELECTOR: ${{ secrets.REG_INPUT_SELECTOR }}
+          LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
+          PRINT_BUTTON_SELECTOR: ${{ secrets.PRINT_BUTTON_SELECTOR }}
+          WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
+          LOGIN_TIMEOUT_SECONDS: "60"
+          RUN_BUDGET_MINUTES: "45"   # save progress and queue the next session
+      - name: Re-dispatch if work remains
+        if: success()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_REF: ${{ github.ref_name }}
+        run: |
+          if (-not (Test-Path ".continue")) {
+            Write-Host "No .continue sentinel; run complete, not re-dispatching."
+          } elseif ([string]::IsNullOrEmpty($env:GH_TOKEN)) {
+            Write-Host "Work remains but GitHub token unavailable; skipping re-dispatch."
+          } else {
+            Write-Host "Work remains -> re-dispatching workflow to continue."
+            gh workflow run run_bot_continuous.yml --ref "$env:WORKFLOW_REF" --repo "$env:GITHUB_REPOSITORY"
+            if ($LASTEXITCODE -ne 0) { throw "Failed to queue the next run." }
+          }

@@ -17,6 +17,9 @@ SUPABASE_TABLE = os.environ.get("SUPABASE_TABLE")
 # Storage bucket holding the web-uploaded list PDF. The list is read
 # straight from Storage and parsed in memory — there is no `source/` directory.
 SUPABASE_BUCKET = os.environ.get("SUPABASE_BUCKET")
+# Optional source project for PDFs when the destination database is elsewhere.
+SUPABASE_SOURCE_URL = os.environ.get("SUPABASE_SOURCE_URL") or SUPABASE_URL
+SUPABASE_SOURCE_KEY = os.environ.get("SUPABASE_SOURCE_KEY") or SUPABASE_KEY
 
 # Portal-specific details — moved to secrets so the public repo doesn't reveal
 # the target site, its form selectors, or the print-window title.
@@ -34,7 +37,7 @@ REQUIRED_SECRETS = [
 ]
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-GROQ_MODEL = "llama-3.3-70b-versatile"  # swap if Groq retires this model
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 # Optional cap for test runs (0 = process everyone in the PDF).
 MAX_CANDIDATES = int(os.environ.get("MAX_CANDIDATES", "0"))
@@ -158,7 +161,7 @@ def fetch_pdf_from_storage():
     PDF is never written to disk (there is no `source/` directory in CI).
     """
     try:
-        sb = _get_supabase()
+        sb = create_client(SUPABASE_SOURCE_URL, SUPABASE_SOURCE_KEY)
         entries = sb.storage.from_(SUPABASE_BUCKET).list()
     except Exception:
         return None, None
