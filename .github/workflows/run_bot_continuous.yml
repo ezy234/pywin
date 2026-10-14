@@ -71,7 +71,7 @@ jobs:
           LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
           PRINT_BUTTON_SELECTOR: ${{ secrets.PRINT_BUTTON_SELECTOR }}
           WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
-          LOGIN_TIMEOUT_SECONDS: "60"
+          LOGIN_TIMEOUT_SECONDS: "180"
       - name: Save progress and failure report
         id: checkpoint
         if: always() && hashFiles('state/progress.json') != ''

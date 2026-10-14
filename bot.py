@@ -560,23 +560,17 @@ def scrape_slip(context, reg):
     page = context.new_page()
     try:
         # Original flow: open login page, wait for it, enter reg, click Login.
-        page.goto(PORTAL_URL, timeout=LOGIN_TIMEOUT_MS)
-        page.wait_for_load_state("networkidle", timeout=LOGIN_TIMEOUT_MS)
-        page.fill(REG_INPUT_SELECTOR, reg)
-        page.click(LOGIN_BUTTON_SELECTOR)
+        page.goto(PORTAL_URL, wait_until="domcontentloaded", timeout=LOGIN_TIMEOUT_MS)
+        page.locator(REG_INPUT_SELECTOR).fill(reg, timeout=LOGIN_TIMEOUT_MS)
+        page.locator(LOGIN_BUTTON_SELECTOR).click(timeout=LOGIN_TIMEOUT_MS)
 
-        # Skip if the portal is too slow to load after entering the reg number.
-        try:
-            page.wait_for_load_state("networkidle", timeout=LOGIN_TIMEOUT_MS)
-        except PlaywrightTimeoutError:
-            return ""
-        time.sleep(5)  # let the dashboard / next page settle (original behavior)
-
-        btn_selector = PRINT_BUTTON_SELECTOR
-        if not page.is_visible(btn_selector):
-            return ""
-
-        page.click(btn_selector)
+        # Network inactivity can happen before an asynchronous login finishes,
+        # or never happen when chat/analytics keep making requests. Wait for the
+        # actual dashboard control instead, including across navigation.
+        print("Waiting for the portal print control...", flush=True)
+        print_button = page.locator(PRINT_BUTTON_SELECTOR)
+        print_button.wait_for(state="visible", timeout=LOGIN_TIMEOUT_MS)
+        print_button.click(timeout=LOGIN_TIMEOUT_MS)
         time.sleep(8)  # let the slip / print view render
 
         # Capture via clipboard, validating that we got THIS candidate's slip.
@@ -588,6 +582,7 @@ def scrape_slip(context, reg):
                 return raw
         return ""
     except PlaywrightTimeoutError:
+        print("WARNING: Portal navigation or control did not become ready within the configured timeout.", flush=True)
         return ""
     except Exception:
         return ""
