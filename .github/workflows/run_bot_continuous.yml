@@ -1,6 +1,16 @@
-name: Portal Bot - 45 minute sessions
+name: Portal Bot - CSV lists (45 minute sessions)
 on:
   workflow_dispatch:
+    inputs:
+      session:
+        description: Academic session to process (recent sessions run first)
+        type: choice
+        options: [all, 2025-2026, 2024-2025, 2023-2024, 2022-2023]
+        default: all
+      resume_run_id:
+        description: Optional run ID containing a portal-progress artifact
+        type: string
+        required: false
 permissions:
   contents: read
   actions: write
@@ -10,7 +20,9 @@ concurrency:
 jobs:
   run-bot:
     runs-on: windows-latest
-    timeout-minutes: 60   # includes setup and shutdown time
+    timeout-minutes: 65   # 45-minute processing budget plus setup and checkpoint upload
+    env:
+      SESSION: ${{ inputs.session || 'all' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -18,45 +30,68 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Test resume behavior
-        run: python -m unittest discover -s tests -v
+      - name: Validate checked-in lists and test error handling
+        run: |
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
+          python run_csv_bot.py --validate-only --session "$env:SESSION"
+          if ($LASTEXITCODE -ne 0) { throw 'Admission CSV validation failed.' }
+      - name: Restore previous session progress
+        if: inputs.resume_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESUME_RUN_ID: ${{ inputs.resume_run_id }}
+        run: |
+          if ($env:RESUME_RUN_ID -notmatch '^\d+$') { throw 'resume_run_id must be a numeric GitHub run ID.' }
+          gh run download "$env:RESUME_RUN_ID" --repo "$env:GITHUB_REPOSITORY" --name portal-progress --dir state
+          if ($LASTEXITCODE -ne 0) { throw 'Could not restore the previous progress artifact. Retry, or start a fresh run without resume_run_id.' }
+          if (-not (Test-Path 'state/progress.json')) { throw 'The restored artifact contains no progress checkpoint.' }
       - name: Install Dependencies
         run: |
-          pip install playwright pywinauto supabase pywin32 pyautogui groq pdfplumber
-          playwright install chrome
-      - name: Run Bot Script
-        run: python bot.py
+          for ($attempt = 1; $attempt -le 3; $attempt++) {
+            python -m pip install --retries 3 --timeout 30 playwright pywinauto supabase pywin32 pyautogui
+            if ($LASTEXITCODE -eq 0) {
+              playwright install chrome
+              if ($LASTEXITCODE -eq 0) { break }
+            }
+            if ($attempt -eq 3) { throw 'Dependency/browser installation failed after three attempts.' }
+            Start-Sleep -Seconds (10 * $attempt)
+          }
+      - name: Process CSV candidates
+        id: bot
+        run: python run_csv_bot.py --session "$env:SESSION" --minutes 45
         env:
           PYTHONUNBUFFERED: "1"
           PYTHONIOENCODING: "utf-8"
           SUPABASE_URL: ${{ secrets.CONTINUOUS_SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.CONTINUOUS_SUPABASE_KEY }}
           SUPABASE_TABLE: portal_candidates
-          SUPABASE_SOURCE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SOURCE_KEY: ${{ secrets.SUPABASE_KEY }}
-          SUPABASE_BUCKET: ${{ secrets.SUPABASE_BUCKET }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GROQ_MODEL: ${{ secrets.GROQ_MODEL || 'openai/gpt-oss-120b' }}
           PORTAL_URL: ${{ secrets.PORTAL_URL }}
           REG_INPUT_SELECTOR: ${{ secrets.REG_INPUT_SELECTOR }}
           LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
           PRINT_BUTTON_SELECTOR: ${{ secrets.PRINT_BUTTON_SELECTOR }}
           WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
           LOGIN_TIMEOUT_SECONDS: "60"
-          RUN_BUDGET_MINUTES: "45"   # save progress and queue the next session
+      - name: Save progress and failure report
+        id: checkpoint
+        if: always() && hashFiles('state/progress.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-progress
+          path: state/
+          retention-days: 14
+          if-no-files-found: error
       - name: Re-dispatch if work remains
-        if: success()
+        if: success() && steps.bot.outputs.complete == 'false' && steps.checkpoint.outcome == 'success'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW_REF: ${{ github.ref_name }}
         run: |
-          if (-not (Test-Path ".continue")) {
-            Write-Host "No .continue sentinel; run complete, not re-dispatching."
-          } elseif ([string]::IsNullOrEmpty($env:GH_TOKEN)) {
-            Write-Host "Work remains but GitHub token unavailable; skipping re-dispatch."
-          } else {
-            Write-Host "Work remains -> re-dispatching workflow to continue."
-            gh workflow run run_bot_continuous.yml --ref "$env:WORKFLOW_REF" --repo "$env:GITHUB_REPOSITORY"
-            if ($LASTEXITCODE -ne 0) { throw "Failed to queue the next run." }
+          if (-not (Test-Path '.continue')) { throw 'Work remains but the continuation marker is missing.' }
+          for ($attempt = 1; $attempt -le 3; $attempt++) {
+            gh workflow run run_bot_continuous.yml --ref "$env:WORKFLOW_REF" --repo "$env:GITHUB_REPOSITORY" -f "session=$env:SESSION" -f "resume_run_id=$env:GITHUB_RUN_ID"
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 3) { throw 'Could not queue the next session. Resume manually using this run ID; the progress artifact is saved.' }
+            Start-Sleep -Seconds (10 * $attempt)
           }

@@ -1,0 +1,830 @@
+{
+  "schema_version": 1,
+  "columns": [
+    "jamb_reg_no",
+    "fullname",
+    "department",
+    "faculty",
+    "academic_session",
+    "list_name",
+    "source_pdf",
+    "source_page",
+    "source_row",
+    "queue_status"
+  ],
+  "lists": [
+    {
+      "path": "2022-2023/2022-2023-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-.csv",
+      "list_name": "2022-2023/2022-2023-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022-2023-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/07/2022-2023-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-.pdf",
+      "source_sha256": "190528932892b371ce9fe1679a3039eb74391f7bda2b21d9065c8ea757e63ed4",
+      "sha256": "33cf0a855fd5c1fc7c0ab2031b03587d40826fd745d7b9799e139963628c62d0",
+      "pages": 15,
+      "rows": 240,
+      "unique_jamb_numbers": 240,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 240
+      }
+    },
+    {
+      "path": "2022-2023/2022-2023-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2022-2023/2022-2023-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022-2023-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/07/2022-2023-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "9faea8dd3e44759484dd73c552257484c0be2667fa0b8cbf860e2a463320ed42",
+      "sha256": "5e7d18aa68d28c959e0bd0f3a65df0beddc0febc3173f102259a8448f2eeeb99",
+      "pages": 19,
+      "rows": 297,
+      "unique_jamb_numbers": 260,
+      "conflicting_jamb_numbers": 27,
+      "status_counts": {
+        "conflicting_duplicate": 56,
+        "ready": 241
+      }
+    },
+    {
+      "path": "2022-2023/2022-2023-PRIMARY-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2022-2023/2022-2023-PRIMARY-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022-2023-PRIMARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/01/2022-2023-PRIMARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "7df7e682f9fa0ce16c9c0de685392f3212122698d6121f491a2a9ad4924ea3b4",
+      "sha256": "9008aecc23b90629ff8d29a27a95ec9166b9fefc7c701ea64eaff8fdc0ab5fd3",
+      "pages": 183,
+      "rows": 3936,
+      "unique_jamb_numbers": 3934,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 3936
+      }
+    },
+    {
+      "path": "2022-2023/2022-2023-SHOPPING-ADMISSION-LIST.csv",
+      "list_name": "2022-2023/2022-2023-SHOPPING-ADMISSION-LIST",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022-2023-SHOPPING-ADMISSION-LIST.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/07/2022-2023-SHOPPING-ADMISSION-LIST.pdf",
+      "source_sha256": "43a9de1b3ff57fbd97748792cfd6308bc356bda5d6e03fa5d83188124b024189",
+      "sha256": "ef8ac8e74abab9891e3244c2b9cffb8e9713648848fa7108be81ad56ee0f4179",
+      "pages": 72,
+      "rows": 1440,
+      "unique_jamb_numbers": 1432,
+      "conflicting_jamb_numbers": 6,
+      "status_counts": {
+        "ready": 1428,
+        "conflicting_duplicate": 12
+      }
+    },
+    {
+      "path": "2022-2023/2022-2023-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2022-2023/2022-2023-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022-2023-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/07/2022-2023-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "1660d3555b055715916bd6f028b52d9c567e3b4135276c10f7703d6ad53e347b",
+      "sha256": "8a95a993862e40928ddba71a2a322f3deec0fcbaa9b0e66c680f69aaa5d03023",
+      "pages": 235,
+      "rows": 4851,
+      "unique_jamb_numbers": 4674,
+      "conflicting_jamb_numbers": 130,
+      "status_counts": {
+        "ready": 4577,
+        "conflicting_duplicate": 268,
+        "missing_jamb_number": 5,
+        "invalid_jamb_number": 1
+      }
+    },
+    {
+      "path": "2022-2023/2022.2023-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-II.csv",
+      "list_name": "2022-2023/2022.2023-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-II",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022.2023-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-II.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/09/2022.2023-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-II.pdf",
+      "source_sha256": "c9c2bf2334cc36d0f28f3c81dad5b142c64bec3aebf8030f5f536797a3e688ef",
+      "sha256": "6d352030d23bff570a7c1f04961c093c5b62ba5df7838a3ddf12bdfb606cbede",
+      "pages": 73,
+      "rows": 1866,
+      "unique_jamb_numbers": 1860,
+      "conflicting_jamb_numbers": 3,
+      "status_counts": {
+        "ready": 1858,
+        "conflicting_duplicate": 6,
+        "missing_jamb_number": 2
+      }
+    },
+    {
+      "path": "2022-2023/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-II.csv",
+      "list_name": "2022-2023/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-II",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-II.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/09/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-II.pdf",
+      "source_sha256": "99870e4c015589848c936c45bfb26621d340ab9fbb58fa26eb0e0ac91c7fb1a0",
+      "sha256": "6dd26650a7de6a6b2199c5e7264a081e0b7cf8c395531320d15b72d4b47af6ab",
+      "pages": 87,
+      "rows": 2230,
+      "unique_jamb_numbers": 1980,
+      "conflicting_jamb_numbers": 80,
+      "status_counts": {
+        "conflicting_duplicate": 168,
+        "ready": 1956,
+        "missing_jamb_number": 105,
+        "missing_fullname": 1
+      }
+    },
+    {
+      "path": "2022-2023/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD.csv",
+      "list_name": "2022-2023/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/10/2022.2023-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD.pdf",
+      "source_sha256": "6cc1ecb4efcc3bcfea8392af890e356d989b580e999c999d7b3c17dc5f3f1848",
+      "sha256": "3e20e593708b8c658b680f9ab678feb9ef546460b7cef767c343ec20f6e3960a",
+      "pages": 14,
+      "rows": 271,
+      "unique_jamb_numbers": 263,
+      "conflicting_jamb_numbers": 8,
+      "status_counts": {
+        "ready": 255,
+        "conflicting_duplicate": 16
+      }
+    },
+    {
+      "path": "2022-2023/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II.csv",
+      "list_name": "2022-2023/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/09/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II.pdf",
+      "source_sha256": "fa87e50aa6e87c3642c54e38985a0b45946c9867b64e6da0265c50cf01316c94",
+      "sha256": "e0c687d8f4e3859b245941e067693e561f1cde2cc4bd547cc02dee7f321c799d",
+      "pages": 7,
+      "rows": 85,
+      "unique_jamb_numbers": 61,
+      "conflicting_jamb_numbers": 1,
+      "status_counts": {
+        "missing_jamb_number": 21,
+        "ready": 62,
+        "conflicting_duplicate": 2
+      }
+    },
+    {
+      "path": "2022-2023/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-III-FOR-UPLOAD.csv",
+      "list_name": "2022-2023/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-III-FOR-UPLOAD",
+      "academic_session": "2022-2023",
+      "source_pdf": "2022-2023/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-III-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/10/2022.2023-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-III-FOR-UPLOAD.pdf",
+      "source_sha256": "84be5b4222253830a113377fcb7499c6b8882438c70d623fbdd7e82440d84523",
+      "sha256": "4f9c8028b5ed105a359f12e807bb5bcaf0604654361eebf9bf94c0075f237a7a",
+      "pages": 3,
+      "rows": 29,
+      "unique_jamb_numbers": 21,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 21,
+        "missing_jamb_number": 8
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-ADDENDUM-TO-SUPPLEMENTARY-LIST-II-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023-2024-ADDENDUM-TO-SUPPLEMENTARY-LIST-II-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-ADDENDUM-TO-SUPPLEMENTARY-LIST-II-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/06/2023-2024-ADDENDUM-TO-SUPPLEMENTARY-LIST-II-FOR-UPLOAD.pdf",
+      "source_sha256": "f5396dba0ac31336b724ef827fa11aa2f33be904d59cf3cd89abb8230eac3979",
+      "sha256": "2c847646bd79aec0e57bb247dea69b9e891898a9470ef76fd4b91e2e19a6c231",
+      "pages": 82,
+      "rows": 1666,
+      "unique_jamb_numbers": 1662,
+      "conflicting_jamb_numbers": 4,
+      "status_counts": {
+        "ready": 1658,
+        "conflicting_duplicate": 8
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023-2024-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/04/2023-2024-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "8a4aeb2cf1da5c71459ee98fdf6f162ddc9a60f032317cf49917ffd99fdb4e23",
+      "sha256": "228991e2218e8d364655a4a24f3cb185ac11a1a9ee3edd9403d016408557b863",
+      "pages": 10,
+      "rows": 161,
+      "unique_jamb_numbers": 160,
+      "conflicting_jamb_numbers": 1,
+      "status_counts": {
+        "ready": 159,
+        "conflicting_duplicate": 2
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-FOREIGN-CANDIDATE-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023-2024-FOREIGN-CANDIDATE-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-FOREIGN-CANDIDATE-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/04/2023-2024-FOREIGN-CANDIDATE-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "d01519baa4a56f0ef514e80b9ca6adaef29c96c814e428f53b1457a9128f219a",
+      "sha256": "a402c8c1ca25329f8f2251fa63317ee8f92ca7b361700979bdf5167c20284bd3",
+      "pages": 4,
+      "rows": 26,
+      "unique_jamb_numbers": 26,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 26
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-PRIMARY-ADMISSION-LIST-.csv",
+      "list_name": "2023-2024/2023-2024-PRIMARY-ADMISSION-LIST-",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-PRIMARY-ADMISSION-LIST-.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2023/12/2023-2024-PRIMARY-ADMISSION-LIST-.pdf",
+      "source_sha256": "ecd0f2cd33025f173a8c63959a57ac4f499891177eda25b917d2c635e5c0efa3",
+      "sha256": "341d7a4915b998d9c6eaece6951422fdf5569413414766548bf6f99af919bca2",
+      "pages": 166,
+      "rows": 4046,
+      "unique_jamb_numbers": 4046,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 4046
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-SHOPPING-LIST-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023-2024-SHOPPING-LIST-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-SHOPPING-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/04/2023-2024-SHOPPING-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "66fec35f167e10e12b7f996fd3fc085e8094aca17202187e246952d67d85f115",
+      "sha256": "a2b0c5c46e176d5f818c1abe48dee5245b64e6b49bb3c6d3acfc614bdd20301d",
+      "pages": 58,
+      "rows": 1144,
+      "unique_jamb_numbers": 1144,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 1144
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023-2024-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/06/2023-2024-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD.pdf",
+      "source_sha256": "2e86334364fd0da094e0d7fc3d8a5962cb215c7c6a0bd90b8a6eea6b9546fccd",
+      "sha256": "6285632eb8105c1d3431959126ba55676930fda1cf6ad4070a914873c35459a6",
+      "pages": 108,
+      "rows": 2492,
+      "unique_jamb_numbers": 2368,
+      "conflicting_jamb_numbers": 72,
+      "status_counts": {
+        "ready": 2327,
+        "conflicting_duplicate": 146,
+        "missing_jamb_number": 19
+      }
+    },
+    {
+      "path": "2023-2024/2023-2024-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023-2024-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023-2024-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/06/2023-2024-SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-II-FOR-UPLOAD.pdf",
+      "source_sha256": "2bdfe48b2e9b7af9a993a5a60ba7969d500d57279347af3c02d9e3cfe6ce3904",
+      "sha256": "110e6e3dd6eaf9493379db0bc94503d7e9883c5c09a4034ba89fb656bd511d3c",
+      "pages": 6,
+      "rows": 64,
+      "unique_jamb_numbers": 35,
+      "conflicting_jamb_numbers": 1,
+      "status_counts": {
+        "missing_jamb_number": 26,
+        "ready": 36,
+        "conflicting_duplicate": 2
+      }
+    },
+    {
+      "path": "2023-2024/2023.2024-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2023-2024/2023.2024-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023.2024-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/04/2023.2024-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "76dbb8842ed93481d2ef0603ad0423722c10296140df62d700bb64a311ab48bd",
+      "sha256": "5066085e6a1d58c69e436400756e293c79ad6d141a805f698d03b3eee3c6ca5e",
+      "pages": 195,
+      "rows": 4782,
+      "unique_jamb_numbers": 4484,
+      "conflicting_jamb_numbers": 248,
+      "status_counts": {
+        "ready": 4266,
+        "conflicting_duplicate": 512,
+        "missing_jamb_number": 4
+      }
+    },
+    {
+      "path": "2023-2024/2023.2024-SUPPLEMENTARY-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST.csv",
+      "list_name": "2023-2024/2023.2024-SUPPLEMENTARY-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST",
+      "academic_session": "2023-2024",
+      "source_pdf": "2023-2024/2023.2024-SUPPLEMENTARY-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/04/2023.2024-SUPPLEMENTARY-DIRECT-ENTRY-PRIMARY-ADMISSION-LIST.pdf",
+      "source_sha256": "e2fb8002e0b48f43784d18516d0bd7730d29e86e75bb82632b876ff6aedbb70f",
+      "sha256": "21e6b7e881a640e63fee0d902c447f51ee11028a1967912e165c104e97262daf",
+      "pages": 8,
+      "rows": 118,
+      "unique_jamb_numbers": 100,
+      "conflicting_jamb_numbers": 6,
+      "status_counts": {
+        "missing_jamb_number": 9,
+        "ready": 96,
+        "conflicting_duplicate": 13
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-DIRECT-ENTRY-JUPEB-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025.csv",
+      "list_name": "2024-2025/2024-2025-DIRECT-ENTRY-JUPEB-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-DIRECT-ENTRY-JUPEB-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-DIRECT-ENTRY-JUPEB-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025.pdf",
+      "source_sha256": "1d6125a7b8d1c4b01b5f64dd8d26aed265e42daf31b5e305a2317feba4dbbe90",
+      "sha256": "c08aee846a3782a86d3da630868df02bd1a4f226063244bb70520904977e97bb",
+      "pages": 12,
+      "rows": 151,
+      "unique_jamb_numbers": 151,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 151
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1-14-3-2025.csv",
+      "list_name": "2024-2025/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1-14-3-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1-14-3-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1-14-3-2025.pdf",
+      "source_sha256": "7a30d56348ee0b361ebf3067898d5f1e88c8f731dd1f6420cd2ad88859f2b379",
+      "sha256": "b97aca909484a5600001108eaa17dcfa935fb6e4a7de6baf3b561edaa5d9c4b3",
+      "pages": 4,
+      "rows": 18,
+      "unique_jamb_numbers": 15,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "missing_jamb_number": 3,
+        "ready": 15
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2-4-2025.csv",
+      "list_name": "2024-2025/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2-4-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2-4-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/04/2024-2025-DIRECT-ENTRY-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2-4-2025.pdf",
+      "source_sha256": "fbb4ed4af1edf20c58c7307bf37ec78014156eb4258573099b06e164201f8702",
+      "sha256": "851726c48a7baa65fed522ef75a3a7f44dff65d9247dd6bea9ff2001c4219454",
+      "pages": 3,
+      "rows": 11,
+      "unique_jamb_numbers": 11,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 11
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-FOREIGN-CANDIDATES-ADMISSIONS-LIST-FOR-UPLOAD-14-3-2025.csv",
+      "list_name": "2024-2025/2024-2025-FOREIGN-CANDIDATES-ADMISSIONS-LIST-FOR-UPLOAD-14-3-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-FOREIGN-CANDIDATES-ADMISSIONS-LIST-FOR-UPLOAD-14-3-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-FOREIGN-CANDIDATES-ADMISSIONS-LIST-FOR-UPLOAD-14-3-2025.pdf",
+      "source_sha256": "5590e8341842e277f910b2afbbd43ec9ef73e1c6e32c126136242e92c148f66e",
+      "sha256": "bc1ac3286d38713b7db77cbdbae7a93027174e5710039ecb538e86874fe06341",
+      "pages": 3,
+      "rows": 16,
+      "unique_jamb_numbers": 16,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 16
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-PRIMARY-ADMISSION-LIST-1.csv",
+      "list_name": "2024-2025/2024-2025-PRIMARY-ADMISSION-LIST-1",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-PRIMARY-ADMISSION-LIST-1.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2024/12/2024-2025-PRIMARY-ADMISSION-LIST-1.pdf",
+      "source_sha256": "d86a329f70541822f9175d0287f6c0c5aeb8b99ba56985723690b798a5f31c96",
+      "sha256": "33aae47614d4bb03749b0994bcebb2d3c11820822632ac05f8313fdcdbbaefdc",
+      "pages": 197,
+      "rows": 4225,
+      "unique_jamb_numbers": 4224,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 4225
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-PRIMARY-DIRECT-ENTRY-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025.csv",
+      "list_name": "2024-2025/2024-2025-PRIMARY-DIRECT-ENTRY-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-PRIMARY-DIRECT-ENTRY-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-PRIMARY-DIRECT-ENTRY-ADMISSION-LIST-FOR-UPLOAD-MSW-14-3-2025.pdf",
+      "source_sha256": "9ce9e67a5c1fae5fbaeeacc916cff1e00f4b85e5468de1694c5dce03f45d14a4",
+      "sha256": "8f34b793a0c32d2ad9ce248bb75f1beef20aa80842d6c9affd8c40c8ebb471c9",
+      "pages": 9,
+      "rows": 106,
+      "unique_jamb_numbers": 106,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 106
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1.csv",
+      "list_name": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1.pdf",
+      "source_url": "https://unn.edu.ng/wp-content/uploads/2025/02/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD-MSW-1.pdf",
+      "source_sha256": "db7154163eab2b45d887d6d8200b74d39f94a7393aec38063abadf892f59d1ab",
+      "sha256": "76739e736a0faf8ce42b3c272cbe797a3acda0fee9b05e7b91917707f28a62d7",
+      "pages": 51,
+      "rows": 1099,
+      "unique_jamb_numbers": 1088,
+      "conflicting_jamb_numbers": 6,
+      "status_counts": {
+        "ready": 1087,
+        "conflicting_duplicate": 12
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2.csv",
+      "list_name": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-II-FOR-UPLOAD-MSW-2.pdf",
+      "source_sha256": "0f67d3c56036c01fe4c4df4105e37c70ccb272add4e7ad11b04489c036d65d80",
+      "sha256": "5bc7c08cc366978127c1eb9414083857d1dde64dd81dc82091733e9f9f2ae418",
+      "pages": 168,
+      "rows": 3962,
+      "unique_jamb_numbers": 3886,
+      "conflicting_jamb_numbers": 73,
+      "status_counts": {
+        "ready": 3816,
+        "conflicting_duplicate": 146
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD-MSW-1-14-3-2025.csv",
+      "list_name": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD-MSW-1-14-3-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD-MSW-1-14-3-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-III-FOR-UPLOAD-MSW-1-14-3-2025.pdf",
+      "source_sha256": "e239519abac9500428151bd2397623921e684a9b788934cc86f3fc604bf118eb",
+      "sha256": "13358282fa7ad7ea20ca5199a8e6d4820d8a094bb021322f06e3fa31babea1f6",
+      "pages": 255,
+      "rows": 5471,
+      "unique_jamb_numbers": 5430,
+      "conflicting_jamb_numbers": 34,
+      "status_counts": {
+        "ready": 5401,
+        "conflicting_duplicate": 69,
+        "missing_jamb_number": 1
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-IV-FOR-UPLOAD-MSW-2-4-2025.csv",
+      "list_name": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-IV-FOR-UPLOAD-MSW-2-4-2025",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-IV-FOR-UPLOAD-MSW-2-4-2025.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/04/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-IV-FOR-UPLOAD-MSW-2-4-2025.pdf",
+      "source_sha256": "3d30d0092eb835b53692f04b0a68c2c61b2e233183ef3d523eabc80585b69a75",
+      "sha256": "38d91ede1e27c0ea9cc73640629045f1c5a0bbba84dac3041c29862d43fa1302",
+      "pages": 41,
+      "rows": 823,
+      "unique_jamb_numbers": 776,
+      "conflicting_jamb_numbers": 4,
+      "status_counts": {
+        "ready": 772,
+        "missing_jamb_number": 43,
+        "conflicting_duplicate": 8
+      }
+    },
+    {
+      "path": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-V-.csv",
+      "list_name": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-V-",
+      "academic_session": "2024-2025",
+      "source_pdf": "2024-2025/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-V-.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/04/2024-2025-SUPPLEMENTARY-ADMISSION-LIST-V-.pdf",
+      "source_sha256": "1253f9f6e63bb8e18398fcb173eb77c3f57a296840b0c793e4bb12f4172f9eef",
+      "sha256": "483ea0a7c4679142769742d4ef9df0c3610668a43e34ae7b489e72d6418f8e68",
+      "pages": 8,
+      "rows": 110,
+      "unique_jamb_numbers": 105,
+      "conflicting_jamb_numbers": 2,
+      "status_counts": {
+        "ready": 103,
+        "missing_jamb_number": 3,
+        "conflicting_duplicate": 4
+      }
+    },
+    {
+      "path": "2025-2026/2025-2026-Additional-Primary-Direct-Entry-List.csv",
+      "list_name": "2025-2026/2025-2026-Additional-Primary-Direct-Entry-List",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025-2026-Additional-Primary-Direct-Entry-List.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2026/03/2025-2026-Additional-Primary-Direct-Entry-List.pdf",
+      "source_sha256": "49bc68342e0372fc8d1eece3f888f0106407638db8f9e49f7e176463489ede31",
+      "sha256": "a4de1591d54d345e5754f8ef25db0be549451fbcbd944b491118751cfc0a5023",
+      "pages": 4,
+      "rows": 51,
+      "unique_jamb_numbers": 51,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 51
+      }
+    },
+    {
+      "path": "2025-2026/2025-2026-ADDITIONAL-PRIMARY-FOR-PUBLICATION.csv",
+      "list_name": "2025-2026/2025-2026-ADDITIONAL-PRIMARY-FOR-PUBLICATION",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025-2026-ADDITIONAL-PRIMARY-FOR-PUBLICATION.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025-2026-ADDITIONAL-PRIMARY-FOR-PUBLICATION.pdf",
+      "source_sha256": "ee84a823c925ae8f291d88252b171c8c3d0bec2b9097d2b10f7d7c6626ca0702",
+      "sha256": "05ae26d60526dc501addfe2e9b80f34df8d0ad383e3919903a63fa9109e3db0e",
+      "pages": 7,
+      "rows": 119,
+      "unique_jamb_numbers": 119,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 119
+      }
+    },
+    {
+      "path": "2025-2026/2025-2026-PUBLIC-ADMINISTRATION-AND-LOCAL-GOVERNMENT-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2025-2026/2025-2026-PUBLIC-ADMINISTRATION-AND-LOCAL-GOVERNMENT-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025-2026-PUBLIC-ADMINISTRATION-AND-LOCAL-GOVERNMENT-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025-2026-PUBLIC-ADMINISTRATION-AND-LOCAL-GOVERNMENT-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "931631133bbe88b80e72f56ee218b6b56371982b7bd098095c5bc6b125415846",
+      "sha256": "63c77b35ba3ca18041834a7b64de840c1bfa8ceacd4b3a740b042ae1bd85add0",
+      "pages": 2,
+      "rows": 16,
+      "unique_jamb_numbers": 0,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "missing_jamb_number": 16
+      }
+    },
+    {
+      "path": "2025-2026/2025-2026-SUPPLEMENTARY-ADMISSION-LIST-IV-1.csv",
+      "list_name": "2025-2026/2025-2026-SUPPLEMENTARY-ADMISSION-LIST-IV-1",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025-2026-SUPPLEMENTARY-ADMISSION-LIST-IV-1.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2026/03/2025-2026-SUPPLEMENTARY-ADMISSION-LIST-IV-1.pdf",
+      "source_sha256": "dfa3c27c8bd10ade4af4fa6d4f859314a7f19b6b57983cb00896caedb6d359c6",
+      "sha256": "9cc0a0e52d87e8603618f02c704a59c7135cb8713e529184043f36d3e291d87f",
+      "pages": 19,
+      "rows": 355,
+      "unique_jamb_numbers": 349,
+      "conflicting_jamb_numbers": 6,
+      "status_counts": {
+        "ready": 343,
+        "conflicting_duplicate": 12
+      }
+    },
+    {
+      "path": "2025-2026/2025-2026-SUPPLEMENTARY-III-ADMISSION.csv",
+      "list_name": "2025-2026/2025-2026-SUPPLEMENTARY-III-ADMISSION",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025-2026-SUPPLEMENTARY-III-ADMISSION.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025-2026-SUPPLEMENTARY-III-ADMISSION.pdf",
+      "source_sha256": "b25531add17939b427bea0b23896e5ea7132a71c0e948d405e9fb81d340b25a0",
+      "sha256": "eb60d891a15333b99f968ffab9298dcb3db8d146661f462bdb123c9adf63e326",
+      "pages": 45,
+      "rows": 1033,
+      "unique_jamb_numbers": 1010,
+      "conflicting_jamb_numbers": 18,
+      "status_counts": {
+        "ready": 994,
+        "conflicting_duplicate": 37,
+        "missing_jamb_number": 1,
+        "invalid_jamb_number": 1
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-ADDENDUM-TO-SUPPLEMENTARY-ADMISSION-LIST-II.csv",
+      "list_name": "2025-2026/2025.2026-ADDENDUM-TO-SUPPLEMENTARY-ADMISSION-LIST-II",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-ADDENDUM-TO-SUPPLEMENTARY-ADMISSION-LIST-II.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-ADDENDUM-TO-SUPPLEMENTARY-ADMISSION-LIST-II.pdf",
+      "source_sha256": "369c568301856462fa53007330640cfa3837e349c9cbb1d8a87086266de439ed",
+      "sha256": "4058a9679b10afce7483f549839bb5cb2dd56126276052aedb8312ad10fd38af",
+      "pages": 86,
+      "rows": 2264,
+      "unique_jamb_numbers": 2254,
+      "conflicting_jamb_numbers": 8,
+      "status_counts": {
+        "ready": 2227,
+        "conflicting_duplicate": 16,
+        "invalid_jamb_number": 19,
+        "missing_jamb_number": 2
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-Revised.csv",
+      "list_name": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-Revised",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-Revised.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-ADDITIONAL-SUPPLEMENTARY-ADMISSION-LIST-Revised.pdf",
+      "source_sha256": "00be0d5e813df5a6b8f7aebd381573e154d183e2eafbf9ca01dc5dc06139138f",
+      "sha256": "52172edc9806ab2de7a122636ee4984fa40976705edbba8a17e20bbf4947ba6a",
+      "pages": 48,
+      "rows": 1075,
+      "unique_jamb_numbers": 1070,
+      "conflicting_jamb_numbers": 5,
+      "status_counts": {
+        "ready": 1065,
+        "conflicting_duplicate": 10
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-II-FOR-UPLOAD.csv",
+      "list_name": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-II-FOR-UPLOAD",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-II-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-II-FOR-UPLOAD.pdf",
+      "source_sha256": "7410c9c6c5eae29f8568556e7f54a6001569b65878918523b6722f964a5c9974",
+      "sha256": "9ba895467f2bf83c7843242f3f8ab34a84971eb548b96ee5170430e7d7bb0971",
+      "pages": 36,
+      "rows": 784,
+      "unique_jamb_numbers": 779,
+      "conflicting_jamb_numbers": 3,
+      "status_counts": {
+        "ready": 778,
+        "conflicting_duplicate": 6
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-III.csv",
+      "list_name": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-III",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-III.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2026/03/2025.2026-ADDITIONAL-SUPPLEMENTARY-LIST-III.pdf",
+      "source_sha256": "e4b2e33c3131db3cccab8a64858a329e128f061778e09ba7de029ae5374afe10",
+      "sha256": "98c6289029fbd5ea7931087e7ace8ea03a934b354224b8eb386870b975419f7f",
+      "pages": 22,
+      "rows": 506,
+      "unique_jamb_numbers": 492,
+      "conflicting_jamb_numbers": 14,
+      "status_counts": {
+        "ready": 478,
+        "conflicting_duplicate": 28
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-FOREIGN-CANDIDATES-LIST-FOR-UPLOAD.csv",
+      "list_name": "2025-2026/2025.2026-FOREIGN-CANDIDATES-LIST-FOR-UPLOAD",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-FOREIGN-CANDIDATES-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-FOREIGN-CANDIDATES-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "af1ba7ad92abd6c6892b4a51146d263df21950bbfe14a89076f12e9d83c11b20",
+      "sha256": "a94a991cbbba285c25371629a9e3345a8181b9ef389e2c214b0910ab504b2db9",
+      "pages": 3,
+      "rows": 18,
+      "unique_jamb_numbers": 18,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 18
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-PRIMARY-ADMISSION-LIST-.csv",
+      "list_name": "2025-2026/2025.2026-PRIMARY-ADMISSION-LIST-",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-PRIMARY-ADMISSION-LIST-.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/10/2025.2026-PRIMARY-ADMISSION-LIST-.pdf",
+      "source_sha256": "fb9b24f3a48fb688f4746eaac1cb4caf644d74a29aca39d0f4c490fb23bb58bc",
+      "sha256": "ca60d3735be89d150f93fdcda1964fc41ed680c2eab837fa0fb3476c7e0c168b",
+      "pages": 206,
+      "rows": 5469,
+      "unique_jamb_numbers": 5469,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 5467,
+        "missing_fullname": 2
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-PRIMARY-DIRECT-ENTRY-LIST-1.csv",
+      "list_name": "2025-2026/2025.2026-PRIMARY-DIRECT-ENTRY-LIST-1",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-PRIMARY-DIRECT-ENTRY-LIST-1.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-PRIMARY-DIRECT-ENTRY-LIST-1.pdf",
+      "source_sha256": "1c63076ba0d3af5dccffc96c11f070c59d2124d537f69bcde7f7378f995dba38",
+      "sha256": "c2311ec7f74971845629a0168c983af76d124d3225365fe17424b0a3f99322c7",
+      "pages": 16,
+      "rows": 312,
+      "unique_jamb_numbers": 309,
+      "conflicting_jamb_numbers": 2,
+      "status_counts": {
+        "ready": 308,
+        "conflicting_duplicate": 4
+      }
+    },
+    {
+      "path": "2025-2026/2025.2026-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.csv",
+      "list_name": "2025-2026/2025.2026-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/2025.2026-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-SUPPLEMENTARY-ADMISSION-LIST-FOR-UPLOAD.pdf",
+      "source_sha256": "115d381f14b4f95f1db68c48c4d666e702389c98b027060d5b74361662e60def",
+      "sha256": "b1d1f851779263ca674452bb2931f330da30ab2aec5bdb2757e56e0262a30e0d",
+      "pages": 46,
+      "rows": 1092,
+      "unique_jamb_numbers": 1090,
+      "conflicting_jamb_numbers": 1,
+      "status_counts": {
+        "ready": 1090,
+        "conflicting_duplicate": 2
+      }
+    },
+    {
+      "path": "2025-2026/SHOPPING-FOR-UPLOAD.csv",
+      "list_name": "2025-2026/SHOPPING-FOR-UPLOAD",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/SHOPPING-FOR-UPLOAD.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/SHOPPING-FOR-UPLOAD.pdf",
+      "source_sha256": "4b7db57e3fd460a96a3d18ac528a3df10adf2b8fb299c1e48cdc9d7e5d85040e",
+      "sha256": "4009e6aacacba8c588b209240b375af934e165ce4199ed458d91c2f66a257bfe",
+      "pages": 58,
+      "rows": 1395,
+      "unique_jamb_numbers": 1395,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 1395
+      }
+    },
+    {
+      "path": "2025-2026/SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-17.11.25.csv",
+      "list_name": "2025-2026/SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-17.11.25",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-17.11.25.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/SUPPLEMENTARY-DIRECT-ENTRY-ADMISSION-LIST-17.11.25.pdf",
+      "source_sha256": "d52d48d34659f7378ddcec4ed9a14f8fc6c2054ed4a653ffc575a427fbbbcd91",
+      "sha256": "e9bdfa97f4f1e95b50f29b40a9166948d4e5f0fb8aa76e2b5f2a246ebd1691d3",
+      "pages": 4,
+      "rows": 35,
+      "unique_jamb_numbers": 34,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 34,
+        "missing_jamb_number": 1
+      }
+    },
+    {
+      "path": "2025-2026/SUPPLEMENTARY-II-LIST.csv",
+      "list_name": "2025-2026/SUPPLEMENTARY-II-LIST",
+      "academic_session": "2025-2026",
+      "source_pdf": "2025-2026/SUPPLEMENTARY-II-LIST.pdf",
+      "source_url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/SUPPLEMENTARY-II-LIST.pdf",
+      "source_sha256": "aab4ea2185d49366451590d4f9ce411401ca7648572cf50e1b9cd9a7e0b0b833",
+      "sha256": "f8d75565db237cc12873a773821a72a3926a130c00c0f38f17384937cdaa4d0c",
+      "pages": 101,
+      "rows": 2459,
+      "unique_jamb_numbers": 2453,
+      "conflicting_jamb_numbers": 5,
+      "status_counts": {
+        "ready": 2420,
+        "invalid_jamb_number": 28,
+        "conflicting_duplicate": 10,
+        "missing_jamb_number": 1
+      }
+    }
+  ],
+  "total_rows": 62719,
+  "missing_downloads": [
+    {
+      "session": "2023-2024",
+      "filename": "2023-2024-VISUAL-IMPAIRED-ADMISSION-LIST-FOR-UPLOAD-1.pdf",
+      "url": "https://www.unn.edu.ng/wp-content/uploads/2024/04/2023-2024-VISUAL-IMPAIRED-ADMISSION-LIST-FOR-UPLOAD-1.pdf",
+      "status": "not_downloaded"
+    },
+    {
+      "session": "2024-2025",
+      "filename": "2024-2025-PHYSICALLY-CHALLENGED-ADMISSIONS-LIST-FOR-UPLOAD-14-3-2025.pdf",
+      "url": "https://www.unn.edu.ng/wp-content/uploads/2025/03/2024-2025-PHYSICALLY-CHALLENGED-ADMISSIONS-LIST-FOR-UPLOAD-14-3-2025.pdf",
+      "status": "not_downloaded"
+    },
+    {
+      "session": "2025-2026",
+      "filename": "2025.2026-admission-list-for-candidates-with-disability-for-upload.pdf",
+      "url": "https://www.unn.edu.ng/wp-content/uploads/2025/11/2025.2026-admission-list-for-candidates-with-disability-for-upload.pdf",
+      "status": "not_downloaded"
+    },
+    {
+      "session": "2022-2023",
+      "filename": "2022.2023-ADMISSION-LIST-FOR-VISUALLY-IMPAIRED-CANDIDATES.pdf",
+      "url": "https://www.unn.edu.ng/wp-content/uploads/2023/09/2022.2023-ADMISSION-LIST-FOR-VISUALLY-IMPAIRED-CANDIDATES.pdf",
+      "status": "not_downloaded"
+    }
+  ]
+}
