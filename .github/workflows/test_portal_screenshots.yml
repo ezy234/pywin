@@ -1,0 +1,45 @@
+name: Portal diagnostic - one registration number
+on:
+  workflow_dispatch:
+    inputs:
+      reg_no:
+        description: JAMB registration number to test (one candidate only)
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install browser and diagnostic dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --retries 3 --timeout 30 playwright pywinauto supabase pywin32 pyautogui
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
+          playwright install chrome
+          if ($LASTEXITCODE -ne 0) { throw 'Chrome installation failed.' }
+      - name: Test one candidate and capture screenshots
+        run: python tools/diagnose_portal.py
+        env:
+          PYTHONUNBUFFERED: '1'
+          PYTHONIOENCODING: utf-8
+          DIAGNOSTIC_REG_NO: ${{ inputs.reg_no }}
+          PORTAL_URL: ${{ secrets.PORTAL_URL }}
+          REG_INPUT_SELECTOR: ${{ secrets.REG_INPUT_SELECTOR }}
+          LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
+          PRINT_BUTTON_SELECTOR: ${{ secrets.PRINT_BUTTON_SELECTOR }}
+          WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
+      - name: Upload screenshots and diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-diagnostic-${{ github.run_id }}
+          path: state/portal-diagnostic/
+          retention-days: 3
+          if-no-files-found: warn
