@@ -32,6 +32,7 @@ def main():
         report('Missing settings.', names=missing)
         return 1
     import bot
+    from portal_status import CLOSED_MESSAGE
     import pyautogui
     from playwright.sync_api import sync_playwright
 
@@ -67,6 +68,10 @@ def main():
             tick = 0
             while time.monotonic() < deadline:
                 capture(f'03-dashboard-{tick:02d}')
+                if page.get_by_text(CLOSED_MESSAGE).first.is_visible():
+                    report('Portal reports application_closed; no retry or Print click needed.')
+                    capture('03-application-closed')
+                    return 0
                 configured_visible = configured.count() == 1 and configured.is_visible()
                 exact_visible = exact.count() == 1 and exact.is_visible()
                 report('Dashboard readiness check.', configured_visible=configured_visible, exact_visible=exact_visible)

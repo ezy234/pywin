@@ -3,6 +3,7 @@ import re
 import io
 import json
 import time
+from portal_status import ApplicationClosed, wait_for_dashboard
 import win32clipboard
 import pyautogui
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
@@ -569,7 +570,9 @@ def scrape_slip(context, reg):
         # actual dashboard control instead, including across navigation.
         print("Waiting for the portal print control...", flush=True)
         print_button = page.locator(PRINT_BUTTON_SELECTOR)
-        print_button.wait_for(state="visible", timeout=LOGIN_TIMEOUT_MS)
+        if wait_for_dashboard(page, print_button, LOGIN_TIMEOUT_MS) == 'application_closed':
+            print("Portal reports: application is currently closed; skipping this candidate.", flush=True)
+            return ApplicationClosed()
         print_button.click(timeout=LOGIN_TIMEOUT_MS)
         time.sleep(8)  # let the slip / print view render
 
@@ -581,7 +584,7 @@ def scrape_slip(context, reg):
             if _looks_like_slip(raw) and _slip_matches_reg(raw, reg):
                 return raw
         return ""
-    except PlaywrightTimeoutError:
+    except (PlaywrightTimeoutError, TimeoutError):
         print("WARNING: Portal navigation or control did not become ready within the configured timeout.", flush=True)
         return ""
     except Exception:

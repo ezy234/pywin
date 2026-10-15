@@ -142,10 +142,15 @@ def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline
             save_progress(checkpoint, progress)
             continue
         parsed = None
+        failure_reason = 'portal_unavailable_or_slip_mismatch'
         for attempt in range(1, 3):
             if pace is not None:
                 pace()
             raw = scrape(reg)
+            if getattr(raw, 'reason', None) == 'application_closed':
+                failure_reason = 'application_closed'
+                print(f'Application closed at queue position {progress["next_index"] + 1}; no retry needed.', flush=True)
+                break
             if raw:
                 try:
                     parsed = parse_labeled_slip(raw, candidate)
@@ -155,8 +160,8 @@ def process_queue(dataset, progress, client, table, scrape, checkpoint, deadline
             print(f'WARNING: No matching labeled slip at queue position {progress["next_index"] + 1}; attempt {attempt}/2.', flush=True)
         if parsed is None:
             progress['failed'] += 1
-            progress['consecutive_failures'] += 1
-            progress['failures'].append({'list_name': list_name, 'jamb_reg_no': reg, 'source_page': candidate['source_page'], 'reason': 'portal_unavailable_or_slip_mismatch', 'attempts': 2})
+            progress['consecutive_failures'] = 0 if failure_reason == 'application_closed' else progress['consecutive_failures'] + 1
+            progress['failures'].append({'list_name': list_name, 'jamb_reg_no': reg, 'source_page': candidate['source_page'], 'reason': failure_reason, 'attempts': attempt})
         else:
             action = save_candidate(client, parsed, candidate['academic_session'])
             progress[action] += 1

@@ -139,6 +139,18 @@ class QueueTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'requested JAMB'):
             parse_labeled_slip(slip(candidate(2)), candidate(1))
 
+    def test_closed_application_skips_retry_and_does_not_trip_portal_circuit_breaker(self):
+        from portal_status import ApplicationClosed
+        dataset = self.dataset(6)
+        progress = load_progress(self.path, dataset)
+        scrape = Mock(return_value=ApplicationClosed())
+        client = FakeClient()
+        self.assertTrue(process_queue(dataset, progress, client, 'portal_candidates', scrape, self.path, 100, clock=lambda: 0))
+        self.assertEqual(scrape.call_count, 6)
+        self.assertEqual(progress['consecutive_failures'], 0)
+        self.assertEqual(len(client.saved), 0)
+        self.assertTrue(all(row['reason'] == 'application_closed' and row['attempts'] == 1 for row in progress['failures']))
+
     def test_budget_checkpoint_resumes_at_next_record(self):
         dataset = self.dataset()
         progress = load_progress(self.path, dataset)
