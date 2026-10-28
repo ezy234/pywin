@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "columns": [
+    "jamb_reg_no",
+    "fullname",
+    "department",
+    "faculty",
+    "academic_session",
+    "list_name",
+    "source_pdf",
+    "source_page",
+    "source_row",
+    "queue_status"
+  ],
+  "lists": [
+    {
+      "path": "2026-2027/primary.csv",
+      "list_name": "2026-2027/primary",
+      "academic_session": "2026-2027",
+      "source_pdf": "2026-2027/primary.pdf",
+      "source_url": "",
+      "source_sha256": "35bbeba6604284697462079ca04592275285ceca068c3fc67952f3d49e4bb052",
+      "sha256": "254d2f68a551bd7497845bb731e07a5f84fe0d4201882c958b522ca4463caddc",
+      "pages": 238,
+      "rows": 6488,
+      "unique_jamb_numbers": 6488,
+      "conflicting_jamb_numbers": 0,
+      "status_counts": {
+        "ready": 6488
+      },
+      "faculty_labels_normalized": 118
+    }
+  ],
+  "total_rows": 6488,
+  "missing_downloads": [],
+  "faculty_aliases": {
+    "VOCATIONAL AND TEC HNICAL EDUCATION": "VOCATIONAL AND TECHNICAL EDUCATION"
+  }
+}

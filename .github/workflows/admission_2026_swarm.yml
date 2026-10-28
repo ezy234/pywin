@@ -1,0 +1,93 @@
+name: Admission 2026-2027 - parallel swarm
+on:
+  workflow_dispatch:
+    inputs:
+      workers:
+        description: Parallel workers (1 to 20; 12 estimated for 24 hours)
+        type: number
+        default: 12
+      run_id:
+        description: Existing swarm UUID to continue (blank creates a new 24-hour run)
+        type: string
+        required: false
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: admission-2026-swarm
+  cancel-in-progress: false
+env:
+  SUPABASE_URL: ${{ secrets.CONTINUOUS_SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.CONTINUOUS_SUPABASE_KEY }}
+  PYTHONUNBUFFERED: '1'
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.queue.outputs.run_id }}
+      matrix: ${{ steps.queue.outputs.matrix }}
+      active: ${{ steps.queue.outputs.active }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m pip install --retries 3 --timeout 30 supabase
+      - id: queue
+        run: python run_admission_swarm.py setup --run-id "$RUN_ID" --workers "$WORKERS"
+        env:
+          RUN_ID: ${{ inputs.run_id }}
+          WORKERS: ${{ inputs.workers || 12 }}
+  workers:
+    needs: setup
+    if: needs.setup.outputs.active == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: ${{ fromJSON(needs.setup.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --retries 3 --timeout 30 playwright pywinauto supabase pywin32 pyautogui
+          if ($LASTEXITCODE -ne 0) { throw 'Dependencies failed' }
+          playwright install chrome
+          if ($LASTEXITCODE -ne 0) { throw 'Chrome failed' }
+      - name: Process leased candidates for 40 minutes
+        run: python run_admission_swarm.py worker --run-id "$env:SWARM_RUN_ID"
+        env:
+          SWARM_RUN_ID: ${{ needs.setup.outputs.run_id }}
+          PORTAL_URL: ${{ secrets.PORTAL_URL }}
+          REG_INPUT_SELECTOR: ${{ secrets.REG_INPUT_SELECTOR }}
+          LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
+          PRINT_BUTTON_SELECTOR: 'button:text-is("Print PUTME Slip")'
+          WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
+          LOGIN_TIMEOUT_SECONDS: '180'
+  continue:
+    needs: [setup, workers]
+    if: always() && needs.setup.result == 'success' && needs.setup.outputs.active == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m pip install --retries 3 --timeout 30 supabase
+      - id: queue
+        run: python run_admission_swarm.py check --run-id "$SWARM_RUN_ID"
+        env:
+          SWARM_RUN_ID: ${{ needs.setup.outputs.run_id }}
+      - name: Start next worker session
+        if: steps.queue.outputs.continue == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SWARM_RUN_ID: ${{ needs.setup.outputs.run_id }}
+          WORKERS: ${{ steps.queue.outputs.workers }}
+          WORKFLOW_REF: ${{ github.ref_name }}
+        run: gh workflow run admission_2026_swarm.yml --repo "$GITHUB_REPOSITORY" --ref "$WORKFLOW_REF" -f "run_id=$SWARM_RUN_ID" -f "workers=$WORKERS"
