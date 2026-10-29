@@ -1,0 +1,114 @@
+# Older admission lists use a separate leased queue and preserve saved receipts.
+name: Portal Bot - older lists swarm
+on:
+  workflow_dispatch:
+    inputs:
+      workers:
+        description: Parallel workers (1 to 20)
+        type: number
+        default: 4
+      session:
+        description: Academic session (all visits newest sessions first)
+        type: choice
+        options: [all, 2025-2026, 2024-2025, 2023-2024, 2022-2023]
+        default: all
+      run_id:
+        description: Existing legacy swarm UUID to continue (blank starts a new queue)
+        type: string
+        required: false
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: portal-legacy-swarm
+  cancel-in-progress: false
+env:
+  SUPABASE_URL: ${{ secrets.CONTINUOUS_SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.CONTINUOUS_SUPABASE_KEY }}
+  PYTHONUNBUFFERED: '1'
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      run_id: ${{ steps.queue.outputs.run_id }}
+      matrix: ${{ steps.queue.outputs.matrix }}
+      active: ${{ steps.queue.outputs.active }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install setup and validation dependencies
+        run: python -m pip install --retries 3 --timeout 30 supabase pymupdf
+      - name: Validate legacy CSVs and local behavior
+        run: |
+          python -m unittest discover -s tests -q
+          python run_legacy_swarm.py validate --session "$SESSION"
+        env:
+          SESSION: ${{ inputs.session || 'all' }}
+      - id: queue
+        run: python run_legacy_swarm.py setup --run-id "$RUN_ID" --workers "$WORKERS" --session "$SESSION"
+        env:
+          RUN_ID: ${{ inputs.run_id }}
+          WORKERS: ${{ inputs.workers || 4 }}
+          SESSION: ${{ inputs.session || 'all' }}
+  workers:
+    needs: setup
+    if: needs.setup.outputs.active == 'true'
+    runs-on: windows-latest
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: ${{ fromJSON(needs.setup.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          python -m pip install --retries 3 --timeout 30 playwright pywinauto supabase pywin32 pyautogui
+          if ($LASTEXITCODE -ne 0) { throw 'Dependencies failed' }
+          playwright install chrome
+          if ($LASTEXITCODE -ne 0) { throw 'Chrome failed' }
+      - name: Process legacy queue for 40 minutes
+        run: python run_legacy_swarm.py worker --run-id "$env:SWARM_RUN_ID"
+        env:
+          SWARM_RUN_ID: ${{ needs.setup.outputs.run_id }}
+          PORTAL_URL: ${{ secrets.PORTAL_URL }}
+          REG_INPUT_SELECTOR: ${{ secrets.REG_INPUT_SELECTOR }}
+          LOGIN_BUTTON_SELECTOR: ${{ secrets.LOGIN_BUTTON_SELECTOR }}
+          PRINT_BUTTON_SELECTOR: 'button:text-is("Print PUTME Slip")'
+          WINDOW_TITLE_RE: ${{ secrets.WINDOW_TITLE_RE }}
+          LOGIN_TIMEOUT_SECONDS: '180'
+  continue:
+    needs: [setup, workers]
+    if: always() && needs.setup.result == 'success' && needs.setup.outputs.active == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: python -m pip install --retries 3 --timeout 30 supabase
+      - id: queue
+        run: python run_legacy_swarm.py check --run-id "$SWARM_RUN_ID"
+        env:
+          SWARM_RUN_ID: ${{ needs.setup.outputs.run_id }}
+      - name: Start next legacy worker session
+        if: steps.queue.outputs.continue == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SWARM_RUN_ID: ${{ needs.setup.outputs.run_id }}
+          WORKERS: ${{ steps.queue.outputs.workers }}
+          SESSION: ${{ steps.queue.outputs.session }}
+          WORKFLOW_REF: ${{ github.ref_name }}
+        run: |
+          for attempt in 1 2 3; do
+            if gh workflow run run_bot_legacy_swarm.yml --repo "$GITHUB_REPOSITORY" --ref "$WORKFLOW_REF" -f "run_id=$SWARM_RUN_ID" -f "workers=$WORKERS" -f "session=$SESSION"; then exit 0; fi
+            sleep 10
+          done
+          exit 1
