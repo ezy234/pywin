@@ -77,6 +77,8 @@ class FakeDB:
                 return SimpleNamespace(data={'action': 'already_processed' if self.receipt else 'inserted'})
             if name == 'skip_saved_portal_swarm':
                 return SimpleNamespace(data=17)
+            if name == 'skip_external_portal_swarm':
+                return SimpleNamespace(data=len(params['p_sources']))
             raise AssertionError('Unexpected RPC '+name)
         return SimpleNamespace(execute=execute)
 
@@ -132,6 +134,61 @@ class LegacySwarmTests(unittest.TestCase):
         scrape.assert_not_called()
         pace.assert_not_called()
         self.assertEqual(db.calls[0][1]['p_data']['course'], 'TEST COURSE')
+
+    def test_old_saved_source_never_copies_a_person_or_receipt(self):
+        db, scrape, pace = FakeDB(), Mock(), Mock()
+        job = self.job()
+        outcome, _ = swarm.process_job(db, job, 'token', scrape, pace,
+            {(job['list_name'], job['reg_no'])})
+        self.assertEqual(outcome, 'external_saved')
+        self.assertEqual(db.queries, [])
+        self.assertEqual(db.calls[0][1]['p_outcome'], 'external_saved')
+        self.assertIsNone(db.calls[0][1]['p_data'])
+        scrape.assert_not_called()
+        pace.assert_not_called()
+
+    def test_old_receipt_does_not_skip_a_different_list_for_same_jamb(self):
+        db, scrape = FakeDB(), Mock(return_value=ApplicationClosed())
+        outcome, _ = swarm.process_job(db, self.job(), 'token', scrape, Mock(),
+            {('another-list', self.job()['reg_no'])})
+        self.assertEqual(outcome, 'closed')
+        scrape.assert_called_once()
+
+    def test_old_bulk_skip_sends_only_matching_public_queue_keys(self):
+        db = FakeDB()
+        rows = [candidate(), candidate('2024-2025')]
+        skipped = swarm.skip_old_sources(db, 'run', rows, {(rows[0]['list_name'], rows[0]['jamb_reg_no'])})
+        self.assertEqual(skipped, 1)
+        self.assertEqual(db.calls[0][1]['p_sources'], [{'list_name': rows[0]['list_name'], 'reg_no': rows[0]['jamb_reg_no']}])
+
+    def test_old_source_reader_pages_and_uses_select_only(self):
+        query = Mock()
+        query.select.return_value = query
+        query.order.return_value = query
+        query.range.return_value = query
+        batch = [{'list_name': 'list', 'reg_no': str(index)+'AA'} for index in range(1000)]
+        query.execute.side_effect = [SimpleNamespace(data=batch), SimpleNamespace(data=[{'list_name': 'last', 'reg_no': '1000aa'}])]
+        old = Mock()
+        old.table.return_value = query
+        keys = swarm.load_old_sources(old)
+        self.assertEqual(len(keys), 1001)
+        self.assertIn(('last', '1000AA'), keys)
+        self.assertEqual([call.args for call in query.range.call_args_list], [(0, 999), (1000, 1999)])
+        query.insert.assert_not_called()
+        query.upsert.assert_not_called()
+        query.update.assert_not_called()
+        old.rpc.assert_not_called()
+
+    def test_invalid_old_response_cannot_be_treated_as_empty_database(self):
+        query = Mock()
+        query.select.return_value = query
+        query.order.return_value = query
+        query.range.return_value = query
+        query.execute.return_value = SimpleNamespace(data=None)
+        old = Mock()
+        old.table.return_value = query
+        with self.assertRaisesRegex(RuntimeError, 'Invalid old-project'):
+            swarm.load_old_sources(old)
 
     def test_closed_application_has_one_scrape_and_closed_outcome(self):
         db, scrape = FakeDB(), Mock(return_value=ApplicationClosed())

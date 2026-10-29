@@ -23,8 +23,10 @@ concurrency:
   group: portal-legacy-swarm
   cancel-in-progress: false
 env:
-  SUPABASE_URL: ${{ secrets.CONTINUOUS_SUPABASE_URL }}
-  SUPABASE_KEY: ${{ secrets.CONTINUOUS_SUPABASE_KEY }}
+  SUPABASE_URL: ${{ secrets.LEGACY_SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.LEGACY_SUPABASE_KEY }}
+  OLD_SUPABASE_URL: ${{ secrets.LEGACY_OLD_SUPABASE_URL }}
+  OLD_SUPABASE_KEY: ${{ secrets.LEGACY_OLD_SUPABASE_KEY }}
   PYTHONUNBUFFERED: '1'
 jobs:
   setup:
