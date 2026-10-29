@@ -15,6 +15,10 @@ existing dashboards, credentials, candidate data, and portal scraping code are p
 
 The source remains the existing 46 checked-in CSVs, with 60,630 ready `(list_name,JAMB number)`
 observations. Default session is `all`; individual academic sessions remain selectable.
+At setup and every continuation, `skip_saved_portal_swarm` reconciles all pending entries against
+the existing source receipts in one database operation. Matching entries become saved immediately;
+active leases, unsaved entries, and existing candidate records are not changed by reconciliation.
+This uses durable per-list receipts rather than guessing a single last successful queue position.
 The validated dataset orders 2025/2026 first, then older sessions. Queue priority preserves this
 claim order; parallel workers may finish in a different order. Existing `save_portal_candidate`
 session comparison prevents older observations from overwriting newer department/faculty details.

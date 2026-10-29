@@ -57,6 +57,11 @@ def setup(db, requested, workers, session):
                 on_conflict='run_id,list_name,reg_no', ignore_duplicates=True).execute())
         retry('Activate complete legacy queue', lambda: db.rpc('activate_portal_swarm', {'p_run': run}).execute())
         record = run_record(db, run)
+    if record['status'] == 'running':
+        skipped = retry('Bulk reconcile saved legacy sources', lambda: db.rpc('skip_saved_portal_swarm', {'p_run': run}).execute()).data
+        if not isinstance(skipped, int) or isinstance(skipped, bool) or skipped < 0:
+            raise RuntimeError('Invalid saved-source reconciliation response')
+        print(f'Bulk skipped {skipped} queue entries already saved in Supabase.', flush=True)
     output('run_id', run)
     output('matrix', json.dumps(list(range(record['workers']))))
     output('active', str(record['status'] == 'running').lower())

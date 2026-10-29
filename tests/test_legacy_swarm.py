@@ -75,6 +75,8 @@ class FakeDB:
                 return SimpleNamespace(data=True)
             if name == 'finish_portal_swarm':
                 return SimpleNamespace(data={'action': 'already_processed' if self.receipt else 'inserted'})
+            if name == 'skip_saved_portal_swarm':
+                return SimpleNamespace(data=17)
             raise AssertionError('Unexpected RPC '+name)
         return SimpleNamespace(execute=execute)
 
@@ -98,7 +100,7 @@ class LegacySwarmTests(unittest.TestCase):
         self.assertEqual([r['priority'] for r in db.batches], [0, 1])
         self.assertNotEqual(db.batches[0]['list_name'], db.batches[1]['list_name'])
         self.assertEqual(db.record['status'], 'running')
-        self.assertEqual(db.calls[-1][0], 'activate_portal_swarm')
+        self.assertEqual([call[0] for call in db.calls], ['activate_portal_swarm', 'skip_saved_portal_swarm'])
 
     def test_continuation_uses_original_session_and_does_not_reseed_running_queue(self):
         db = FakeDB(self.record(academic_session='2024-2025'))
@@ -106,6 +108,7 @@ class LegacySwarmTests(unittest.TestCase):
             swarm.setup(db, db.record['id'], 20, 'all')
         load.assert_called_once_with(swarm.MANIFEST, '2024-2025')
         self.assertEqual(db.batches, [])
+        self.assertEqual(db.calls[-1], ('skip_saved_portal_swarm', {'p_run': db.record['id']}))
         self.assertIn(('matrix', '[0, 1, 2]'), [call.args for call in out.call_args_list])
 
     def test_changed_manifest_refuses_resume(self):
@@ -114,6 +117,13 @@ class LegacySwarmTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'changed'):
                 swarm.setup(db, db.record['id'], 3, 'all')
         self.assertEqual(db.calls, [])
+
+    def test_paused_setup_does_not_reconcile_or_resume_work(self):
+        db = FakeDB(self.record(status='paused'))
+        with patch.object(swarm, 'load_dataset', return_value=Dataset([candidate(), candidate()], 'fingerprint', {})), patch.object(swarm, 'output') as out:
+            swarm.setup(db, db.record['id'], 3, 'all')
+        self.assertEqual(db.calls, [])
+        self.assertIn(('active', 'false'), [call.args for call in out.call_args_list])
 
     def test_saved_receipt_avoids_browser_and_pacing(self):
         db, scrape, pace = FakeDB(receipt=True), Mock(), Mock()
