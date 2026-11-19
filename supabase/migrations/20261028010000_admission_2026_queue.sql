@@ -22,7 +22,7 @@ revoke all on public.admission_2026_runs,public.admission_2026_queue from anon,a
 grant all on public.admission_2026_runs,public.admission_2026_queue to service_role;
 grant usage,select on sequence public.admission_2026_queue_id_seq to service_role;
 
-create function public.claim_admission_2026(p_run uuid,p_token uuid) returns jsonb
+create or replace function public.claim_admission_2026(p_run uuid,p_token uuid) returns jsonb
 language plpgsql security invoker set search_path=public,pg_temp as $$
 declare r public.admission_2026_runs%rowtype; q public.admission_2026_queue%rowtype;
 begin
@@ -44,7 +44,7 @@ begin
   return to_jsonb(q);
 end $$;
 
-create function public.finish_admission_2026(p_id bigint,p_token uuid,p_outcome text,p_data jsonb default null)
+create or replace function public.finish_admission_2026(p_id bigint,p_token uuid,p_outcome text,p_data jsonb default null)
 returns jsonb language plpgsql security invoker set search_path=public,pg_temp as $$
 declare q public.admission_2026_queue%rowtype; result jsonb;
 begin

@@ -34,7 +34,8 @@ def run_record(db, run):
 
 def setup(db, requested, workers):
     catalog = retry('Read private admission catalog', lambda: db.table('admission_2026_catalog').select('fingerprint,candidates').eq('id', 'primary').execute()).data
-    if len(catalog) != 1 or len(catalog[0]['candidates']) != 6488:
+    if (len(catalog) != 1 or not isinstance(catalog[0].get('candidates'), list)
+            or not catalog[0]['candidates'] or not catalog[0].get('fingerprint')):
         raise ValueError('Private admission catalog is missing or incomplete')
     candidates, fingerprint = catalog[0]['candidates'], catalog[0]['fingerprint']
     if not 1 <= workers <= 20:
